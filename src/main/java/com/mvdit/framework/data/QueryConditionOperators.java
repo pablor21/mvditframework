@@ -19,7 +19,8 @@ public enum QueryConditionOperators {
     AND("AND"),
     OR("OR"),
     NOT("NOT"),
-    XOR("XOR");
+    XOR("XOR"),
+    NONE("");
 
     private final String operator;
 

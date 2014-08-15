@@ -45,7 +45,10 @@ public enum QueryConditionComparators {
     MATCH("MATCH"),
     MA("MATCH"),//short MATCH
     AGAINST("AGAINST"),
-    AG("AGAINST");//short AGAINST
+    AG("AGAINST"),//short AGAINST
+    IS_NULL("IS NULL"),
+    NOT_NULL("NOT NULL"),
+    NONE("");
 
     private final String comparator;
 

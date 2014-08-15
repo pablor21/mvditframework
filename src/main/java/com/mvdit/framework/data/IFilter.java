@@ -15,19 +15,18 @@ import java.util.Map;
  * @param <T>
  */
 public interface IFilter<T> {
-    Map<String, QueryCondition> getConditions();
+    List<QueryCondition> getConditions();
     String getFields();
     int getPageSize();
     int getPageNumber();
     void setPageSize(int pageSize);
     void setPageNumber(int pageNumber);
     void setConditions(List<QueryCondition> conditions);
-    void setConditions(Map<String, QueryCondition> conditions);
     void setFields(String fields);
     void addCondition(QueryCondition condition);
-    void addCondition(String key, QueryCondition condition);
     Map<String,Object> getParametersValues();
     void addOrderParam(OrderParam order);   
     List<OrderParam> getOrderParams();
+    String getWhereSentence(String objectQualifier);
     //int getLastPageNumber();
 }

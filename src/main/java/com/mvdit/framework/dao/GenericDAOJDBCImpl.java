@@ -124,7 +124,7 @@ public abstract class GenericDAOJDBCImpl<T extends IDBEntity, K> implements IGen
      * @return
      */
     public String getConditionsStr(IFilter filter) {
-        StringBuilder sb = new StringBuilder();
+        /*StringBuilder sb = new StringBuilder();
         if (filter != null) {
             Map<String, QueryCondition> conditions= filter.getConditions();
             Iterator<String> iterator = conditions.keySet().iterator();
@@ -149,7 +149,8 @@ public abstract class GenericDAOJDBCImpl<T extends IDBEntity, K> implements IGen
                 }
             }
         }
-        return sb.toString();
+        return sb.toString();*/
+        throw new MvditRuntimeException("sin implementar");
     }
 
     /**

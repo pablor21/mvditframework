@@ -23,7 +23,7 @@ public class GenericPageResult<T> implements IPageResult<T> {
     protected int totalItemCount;
     protected int currentPageNumber;
     protected List<OrderParam> orderParams;
-    protected Map<String, QueryCondition> conditions;
+    protected List<QueryCondition> conditions;
     
     /**
      * ATENCIÓN: No usar este constructor, sólo es usado para parsear por los ws
@@ -32,7 +32,7 @@ public class GenericPageResult<T> implements IPageResult<T> {
         
     }
 
-    public GenericPageResult(List<T> elements, IFilter filter, Map<String,QueryCondition> conditions, List<OrderParam> orderParams, int totalItemCount) {
+    public GenericPageResult(List<T> elements, IFilter filter, List<QueryCondition> conditions, List<OrderParam> orderParams, int totalItemCount) {
         this.elements = elements;
         this.orderParams= orderParams;
         this.conditions= conditions;
@@ -147,7 +147,7 @@ public class GenericPageResult<T> implements IPageResult<T> {
     }
 
     @Override
-    public Map<String,QueryCondition> getConditions() {
+    public List<QueryCondition> getConditions() {
         return this.conditions;
     }
 

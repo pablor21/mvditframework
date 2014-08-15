@@ -52,6 +52,13 @@ public interface IGenericDAO<T, K> extends ITransaction{
      * @return 
      */
     T getById(K id);
+    /**
+     * Busca un elemento por el nombre y valor de un campo
+     * @param fieldName
+     * @param value
+     * @return 
+     
+    T getOneByField(String fieldName, Object value);*/
 
     /**
      * 

@@ -8,7 +8,6 @@ package com.mvdit.framework.data;
 import com.mvdit.framework.core.MvditRuntimeException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +20,7 @@ public class GenericFilter implements IFilter {
     protected int pageSize;
     protected int pageNumber;
     protected String fields;
-    protected Map<String,QueryCondition> conditions;
+    protected List<QueryCondition> conditions;
     protected List<OrderParam> orderParams;
 
     public GenericFilter(int pageNumber, int pageSize, String fields) {
@@ -37,7 +36,7 @@ public class GenericFilter implements IFilter {
     }
 
     public GenericFilter() {
-        this.conditions = new HashMap<>();
+        this.conditions = new ArrayList<>();
         this.orderParams = new ArrayList<>();
         this.pageNumber = 1;
         this.pageSize = 0;
@@ -45,8 +44,13 @@ public class GenericFilter implements IFilter {
     }
 
     @Override
-    public Map<String, QueryCondition> getConditions() {
+    public List getConditions() {
         return this.conditions;
+    }
+
+    @Override
+    public void setConditions(List conditions) {
+        this.conditions = conditions;
     }
 
     @Override
@@ -84,18 +88,11 @@ public class GenericFilter implements IFilter {
     public void setFields(String fields) {
         this.fields = fields;
     }
-    
-     @Override
-    public void addCondition(String key, QueryCondition condition) {
-        this.conditions.put(key, condition);
-    }
 
     @Override
     public void addCondition(QueryCondition condition) {
-        this.addCondition(condition.getField(), condition);
+        this.conditions.add(condition);
     }
-
-    
 
     @Override
     public void addOrderParam(OrderParam order) {
@@ -110,53 +107,25 @@ public class GenericFilter implements IFilter {
     @Override
     public Map<String, Object> getParametersValues() {
         Map<String, Object> parameters = new HashMap<String, Object>();
-        Iterator<String> iterator = this.conditions.keySet().iterator();
-        boolean isFirst = true;
-        while (iterator.hasNext()) {
-            String key= iterator.next();
-            QueryCondition condition = this.conditions.get(key);
+        for (QueryCondition condition : this.conditions) {
             if (condition.isValid()) {
-                switch(condition.getComparator()){
-                    case ENDS_WITH:
-                    case EW:
-                        parameters.put(key, "%" + condition.getValue());
-                        break;
-                    case CONTAINS:
-                    case CN:
-                        parameters.put(key,"%" +condition.getValue() + "%");
-                        break;
-                    case STARTS_WITH:
-                    case SW:
-                        parameters.put(key,condition.getValue()+ "%");
-                        break;
-                    default:
-                        parameters.put(key,condition.getValue());
+                if (condition.isValid()) {
+                    parameters.putAll(condition.getParametersValues(""));
                 }
-                
             }
         }
         return parameters;
     }
 
     @Override
-    public void setConditions(List conditions) {
-        if(conditions!=null){
-            this.conditions= new HashMap<>();
-            for(Object c: conditions){
-                QueryCondition qc= (QueryCondition)c;
-                this.addCondition(qc);
-            }
+    public String getWhereSentence(String objectQualifier) {
+        StringBuilder sb = new StringBuilder();
+        boolean incOp = false;
+        for (QueryCondition condition : this.conditions) {
+            sb.append(condition.getSentenceStr(objectQualifier, incOp));
+            sb.append(" ");
+            incOp = true;
         }
+        return sb.toString();
     }
-
-    @Override
-    public void setConditions(Map conditions) {
-        this.conditions= new HashMap<>();
-        if(conditions!=null){
-            this.conditions= conditions;
-        }
-    }
-
-   
-
 }

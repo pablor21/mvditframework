@@ -29,5 +29,5 @@ public interface IPageResult<T>{
     int getFromElement();
     int getToElement();
     List<OrderParam> getOrderParams();
-    Map<String,QueryCondition> getConditions();
+    List<QueryCondition> getConditions();
 }
