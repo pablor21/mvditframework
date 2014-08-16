@@ -17,10 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.print.DocFlavor;
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonValue;
-import org.codehaus.jackson.map.annotate.JsonView;
 
 /**
  *
@@ -45,7 +42,7 @@ public class QueryCondition {
         this.field = field;
         this.valuesList = new ArrayList<>();
         this.singleValue = null;
-        this.type = QueryConditionTypes.NO_VALUE;
+        this.type = QueryConditionTypes.SINGLE;
         this.dataType = QueryConditionDataTypes.OBJECT;
         this.ignoreOnPlain = false;
     }
@@ -105,7 +102,6 @@ public class QueryCondition {
         this.ignoreOnPlain = ignoreOnPlain;
     }
 
-   
     public QueryConditionDataTypes getDataType() {
         return dataType;
     }
@@ -133,7 +129,7 @@ public class QueryCondition {
         this.singleValue = null;
         this.valuesList = values;
     }
-    
+
     public void addValueList(QueryCondition... values) {
         this.type = QueryConditionTypes.MULTIPLE;
         this.singleValue = null;
@@ -224,6 +220,10 @@ public class QueryCondition {
     public QueryConditionTypes getType() {
         return type;
     }
+    
+    public void setType(QueryConditionTypes type){
+        this.type=type;
+    }
 
     @JsonIgnore
     public boolean isValid() {
@@ -240,7 +240,7 @@ public class QueryCondition {
         StringBuilder sb = new StringBuilder();
         sb.append(" ");
         if (includeOperator) {
-            sb.append((!MvditUtils.stringEmpty(this.operator.toString()))?this.operator:QueryConditionOperators.AND);
+            sb.append((!MvditUtils.stringEmpty(this.operator.toString())) ? this.operator : QueryConditionOperators.AND);
             sb.append(" ");
         }
         if (this.type == QueryConditionTypes.SINGLE) {
@@ -252,12 +252,18 @@ public class QueryCondition {
             sb.append(" ");
             sb.append(this.comparator);
             sb.append(" ");
-            sb.append(":");
-            if (!MvditUtils.stringEmpty(keyPrepend)) {
-                sb.append(keyPrepend);
-                sb.append("_");
+            if (this.comparator == QueryConditionComparators.NOT_NULL
+                    || this.comparator == QueryConditionComparators.IS_NULL) {
+
+            } else {
+                sb.append(":");
+                if (!MvditUtils.stringEmpty(keyPrepend)) {
+                    sb.append(keyPrepend);
+                    sb.append("_");
+                }
+                sb.append(this.getId());
             }
-            sb.append(this.getId());
+
         } else if (this.type == QueryConditionTypes.MULTIPLE) {
             sb.append("(");
             boolean incOp = false;
@@ -299,8 +305,13 @@ public class QueryCondition {
             key = keyPrepend + "_" + this.getId();
         }
         if (this.type == QueryConditionTypes.SINGLE) {
-            Object value = formatSingleValue();
-            ret.put(key, value);
+            if (this.comparator == QueryConditionComparators.NOT_NULL
+                    || this.comparator == QueryConditionComparators.IS_NULL) {
+
+            } else {
+                Object value = formatSingleValue();
+                ret.put(key, value);
+            }
         } else if (this.type == QueryConditionTypes.MULTIPLE) {
             for (QueryCondition qc : this.valuesList) {
                 ret.putAll(qc.getParametersValues(key));
