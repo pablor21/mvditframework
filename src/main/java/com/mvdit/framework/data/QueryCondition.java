@@ -13,10 +13,14 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.print.DocFlavor;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonValue;
+import org.codehaus.jackson.map.annotate.JsonView;
 
 /**
  *
@@ -32,6 +36,7 @@ public class QueryCondition {
     protected Object singleValue;
     protected QueryConditionTypes type;
     protected QueryConditionDataTypes dataType;
+    protected boolean ignoreOnPlain;
 
     public QueryCondition(String id, String field, QueryConditionComparators comparator, QueryConditionOperators operator) {
         this.comparator = comparator;
@@ -42,10 +47,23 @@ public class QueryCondition {
         this.singleValue = null;
         this.type = QueryConditionTypes.NO_VALUE;
         this.dataType = QueryConditionDataTypes.OBJECT;
+        this.ignoreOnPlain = false;
     }
 
     public QueryCondition() {
         this("", "", QueryConditionComparators.NONE, QueryConditionOperators.NONE);
+    }
+
+    public QueryCondition(QueryCondition src) {
+        this.comparator = src.comparator;
+        this.operator = src.operator;
+        this.id = src.id;
+        this.field = src.field;
+        this.valuesList = src.valuesList;
+        this.singleValue = src.singleValue;
+        this.type = src.type;
+        this.dataType = src.dataType;
+        this.ignoreOnPlain = src.ignoreOnPlain;
     }
 
     public QueryConditionComparators getComparator() {
@@ -83,6 +101,11 @@ public class QueryCondition {
         this.id = id;
     }
 
+    public void setIgnoreOnPlain(boolean ignoreOnPlain) {
+        this.ignoreOnPlain = ignoreOnPlain;
+    }
+
+   
     public QueryConditionDataTypes getDataType() {
         return dataType;
     }
@@ -109,6 +132,12 @@ public class QueryCondition {
         this.type = QueryConditionTypes.MULTIPLE;
         this.singleValue = null;
         this.valuesList = values;
+    }
+    
+    public void addValueList(QueryCondition... values) {
+        this.type = QueryConditionTypes.MULTIPLE;
+        this.singleValue = null;
+        this.valuesList.addAll(Arrays.asList(values));
     }
 
     public void addCondition(QueryCondition cond) {
@@ -182,7 +211,7 @@ public class QueryCondition {
                 }
                 return val;
             default:
-                return this.dataType.getClass().cast(this.singleValue);
+                return this.dataType.type().cast(this.singleValue);
         }
     }
 
@@ -201,8 +230,8 @@ public class QueryCondition {
         //return !MvditUtils.stringEmpty(field);
         return true;
     }
-    
-    public String getSentenceStr(String entityQualifier, boolean includeOperator){
+
+    public String getSentenceStr(String entityQualifier, boolean includeOperator) {
         return getSentenceStr(entityQualifier, "", includeOperator);
     }
 
@@ -211,7 +240,7 @@ public class QueryCondition {
         StringBuilder sb = new StringBuilder();
         sb.append(" ");
         if (includeOperator) {
-            sb.append(this.operator);
+            sb.append((!MvditUtils.stringEmpty(this.operator.toString()))?this.operator:QueryConditionOperators.AND);
             sb.append(" ");
         }
         if (this.type == QueryConditionTypes.SINGLE) {
@@ -222,6 +251,7 @@ public class QueryCondition {
             sb.append(this.field);
             sb.append(" ");
             sb.append(this.comparator);
+            sb.append(" ");
             sb.append(":");
             if (!MvditUtils.stringEmpty(keyPrepend)) {
                 sb.append(keyPrepend);
@@ -239,6 +269,26 @@ public class QueryCondition {
         }
         sb.append(" ");
         return sb.toString();
+    }
+
+    @JsonIgnore
+    public List<QueryCondition> getPlainConditions(String prependKey) {
+        List<QueryCondition> conditions = new ArrayList<>();
+        if (!this.ignoreOnPlain) {
+            QueryCondition copy = new QueryCondition(this);
+            if (!MvditUtils.stringEmpty(prependKey)) {
+                copy.id = prependKey + "_" + copy.id;
+            }
+            if (this.type == QueryConditionTypes.SINGLE) {
+                conditions.add(copy);
+            } else if (this.type == QueryConditionTypes.MULTIPLE) {
+                for (QueryCondition qc : this.valuesList) {
+                    conditions.addAll(qc.getPlainConditions(copy.id));
+                }
+            }
+
+        }
+        return conditions;
     }
 
     @JsonIgnore

@@ -16,6 +16,7 @@ import java.util.Map;
  */
 public interface IFilter<T> {
     List<QueryCondition> getConditions();
+    List<QueryCondition> getPlainConditions();
     String getFields();
     int getPageSize();
     int getPageNumber();
@@ -28,5 +29,5 @@ public interface IFilter<T> {
     void addOrderParam(OrderParam order);   
     List<OrderParam> getOrderParams();
     String getWhereSentence(String objectQualifier);
-    //int getLastPageNumber();
+    List<QueryCondition> containsFieldName(String fieldName);
 }

@@ -12,12 +12,13 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.codehaus.jackson.annotate.JsonValue;
 
 /**
  *
  * @author Pablo Ramírez
  */
-@XmlRootElement
+@XmlRootElement(name = "QCDT")
 public enum QueryConditionDataTypes {
     DATE(Date.class),
     DATE_TIME(Date.class),
@@ -31,6 +32,7 @@ public enum QueryConditionDataTypes {
     OBJECT(Object.class),
     BIGINTEGER(BigInteger.class),
     BIGDECIMAL(BigDecimal.class),
+    BOOL(BigDecimal.class),
     BOOLEAN(Boolean.class);
 
     private final Class<?> type;
@@ -49,6 +51,14 @@ public enum QueryConditionDataTypes {
     @Override
     public String toString() {
         return this.type.getCanonicalName();
+    }
+    @JsonValue
+    public String value(){
+        return this.name();
+    }
+    
+    public Class<?> type(){
+        return this.type;
     }
 
     /**

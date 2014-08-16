@@ -280,7 +280,7 @@ public abstract class GenericDAOJPAImpl<T, K> implements IGenericDAO<T, K> {
                 query.setMaxResults(filter.getPageSize());
             }
             List<T> resultList = query.getResultList();
-            IPageResult result = new GenericPageResult(resultList, filter, filter.getConditions(), filter.getOrderParams(), count(filter));
+            IPageResult result = new GenericPageResult(resultList, filter, filter.getPlainConditions(), filter.getOrderParams(), count(filter));
             //si obtengo una pagina vacía y estoy filtrando, muestro la primera página
             if (result.getElements().isEmpty() && filter.getPageNumber() > 1) {
                 filter.setPageNumber(result.getPageCount());

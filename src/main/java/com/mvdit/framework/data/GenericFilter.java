@@ -42,6 +42,15 @@ public class GenericFilter implements IFilter {
         this.pageSize = 0;
         this.fields = "*";
     }
+    
+    @Override
+    public List getPlainConditions(){
+        List<QueryCondition> ret= new ArrayList<>();
+        for(QueryCondition qc:this.conditions){
+            ret.addAll(qc.getPlainConditions(""));
+        }
+        return ret;
+    }
 
     @Override
     public List getConditions() {
@@ -107,7 +116,8 @@ public class GenericFilter implements IFilter {
     @Override
     public Map<String, Object> getParametersValues() {
         Map<String, Object> parameters = new HashMap<String, Object>();
-        for (QueryCondition condition : this.conditions) {
+        List<QueryCondition> conds= this.getConditions();
+        for (QueryCondition condition : conds) {
             if (condition.isValid()) {
                 if (condition.isValid()) {
                     parameters.putAll(condition.getParametersValues(""));
@@ -121,11 +131,24 @@ public class GenericFilter implements IFilter {
     public String getWhereSentence(String objectQualifier) {
         StringBuilder sb = new StringBuilder();
         boolean incOp = false;
-        for (QueryCondition condition : this.conditions) {
+        List<QueryCondition> conds= this.getConditions();
+        for (QueryCondition condition : conds) {
             sb.append(condition.getSentenceStr(objectQualifier, incOp));
             sb.append(" ");
             incOp = true;
         }
         return sb.toString();
+    }
+
+    @Override
+    public List containsFieldName(String fieldName) {
+        List<QueryCondition> ret= new ArrayList<>();
+        List<QueryCondition> conds= this.getConditions();
+        for(QueryCondition qc:conds){
+            if(qc.getField().equalsIgnoreCase(fieldName)){
+                ret.add(qc);
+            }
+        }
+        return ret;
     }
 }
