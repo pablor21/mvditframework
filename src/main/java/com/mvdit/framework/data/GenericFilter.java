@@ -45,6 +45,7 @@ public class GenericFilter implements IFilter {
     
     @Override
     public List getPlainConditions(){
+        this.prepareConditions();
         List<QueryCondition> ret= new ArrayList<>();
         for(QueryCondition qc:this.conditions){
             ret.addAll(qc.getPlainConditions(""));
@@ -54,6 +55,7 @@ public class GenericFilter implements IFilter {
 
     @Override
     public List getConditions() {
+        this.prepareConditions();
         return this.conditions;
     }
 
@@ -115,8 +117,9 @@ public class GenericFilter implements IFilter {
 
     @Override
     public Map<String, Object> getParametersValues() {
+        this.prepareConditions();
         Map<String, Object> parameters = new HashMap<String, Object>();
-        List<QueryCondition> conds= this.getConditions();
+        List<QueryCondition> conds= this.conditions;
         for (QueryCondition condition : conds) {
             if (condition.isValid()) {
                 if (condition.isValid()) {
@@ -129,9 +132,10 @@ public class GenericFilter implements IFilter {
 
     @Override
     public String getWhereSentence(String objectQualifier) {
+        this.prepareConditions();
         StringBuilder sb = new StringBuilder();
         boolean incOp = false;
-        List<QueryCondition> conds= this.getConditions();
+        List<QueryCondition> conds= this.conditions;
         for (QueryCondition condition : conds) {
             sb.append(condition.getSentenceStr(objectQualifier, incOp));
             sb.append(" ");
@@ -143,12 +147,16 @@ public class GenericFilter implements IFilter {
     @Override
     public List containsFieldName(String fieldName) {
         List<QueryCondition> ret= new ArrayList<>();
-        List<QueryCondition> conds= this.getConditions();
+        List<QueryCondition> conds= this.conditions;
         for(QueryCondition qc:conds){
             if(qc.getField().equalsIgnoreCase(fieldName)){
                 ret.add(qc);
             }
         }
         return ret;
+    }
+    
+    public void prepareConditions(){
+        return;
     }
 }
