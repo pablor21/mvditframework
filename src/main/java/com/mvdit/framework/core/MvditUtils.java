@@ -7,6 +7,7 @@ package com.mvdit.framework.core;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -62,5 +63,17 @@ public class MvditUtils {
         //BigDecimal bd = new BigDecimal(value);
         value = value.setScale(places, RoundingMode.HALF_UP);
         return value;
+    }
+
+    public static BigDecimal parseStringToBigDecimal(String strVal) {
+        strVal = strVal.replaceAll("[^0-9.,]", "");
+        BigDecimal bd = new BigDecimal(strVal);
+        return bd;
+    }
+
+    public static BigInteger parseStringToBigInteger(String strVal) {
+        strVal = strVal.replaceAll("[^0-9]", "");
+        BigInteger bi = new BigInteger(strVal);
+        return bi;
     }
 }

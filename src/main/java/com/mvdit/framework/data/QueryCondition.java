@@ -168,13 +168,9 @@ public class QueryCondition {
             case OBJECT:
                 return this.singleValue;
             case BIGDECIMAL:
-                String strVal = this.singleValue.toString().replaceAll("[^0-9.,]", "");
-                BigDecimal bd = new BigDecimal(strVal);
-                return bd;
+                return MvditUtils.parseStringToBigDecimal(this.singleValue.toString());
             case BIGINTEGER:
-                String strValX = this.singleValue.toString().replaceAll("[^0-9]", "");
-                BigInteger bi = new BigInteger(strValX);
-                return bi;
+               return MvditUtils.parseStringToBigInteger(this.singleValue.toString());
             case DATE:
                 try {
                     DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -220,9 +216,9 @@ public class QueryCondition {
     public QueryConditionTypes getType() {
         return type;
     }
-    
-    public void setType(QueryConditionTypes type){
-        this.type=type;
+
+    public void setType(QueryConditionTypes type) {
+        this.type = type;
     }
 
     @JsonIgnore
