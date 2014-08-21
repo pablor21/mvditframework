@@ -13,27 +13,40 @@ import java.sql.SQLException;
  * @author Pablo Ramírez
  */
 public class MvditRuntimeException extends RuntimeException {
+    protected String message;
+    
+    public MvditRuntimeException(){
+        super();
+    }
     
     public MvditRuntimeException(Exception ex){
         super(ex);
+        this.message= ex.getMessage();
     }
 
     public MvditRuntimeException(SQLException ex) {
         super(ex);
+        this.message= ex.getMessage();
+        
     }
     
     public MvditRuntimeException(String message){
         super(message);
+        this.message= message;
     }
 
     @Override
     public String getMessage() {
-        /*try{
-            MvditApp.getInstance().getLogger().error(this);
-        }catch(Throwable ex){
-            
-        }*/
-        return super.getMessage();
+        return this.message;
+    }
+    
+    public void setMessage(String message){
+        this.message= message;
+    }
+
+    @Override
+    public String getLocalizedMessage() {
+        return super.getLocalizedMessage();
     }
     
     

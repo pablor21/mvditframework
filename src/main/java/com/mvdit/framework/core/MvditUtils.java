@@ -12,6 +12,11 @@ import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 /**
  *
@@ -76,4 +81,18 @@ public class MvditUtils {
         BigInteger bi = new BigInteger(strVal);
         return bi;
     }
+    
+    /**
+     * Validador de las entidades
+     *
+     * @return
+     */
+    public static Validator getValidator() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        return validator;
+    }
+    
+    
 }

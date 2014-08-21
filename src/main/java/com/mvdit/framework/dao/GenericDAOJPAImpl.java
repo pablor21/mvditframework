@@ -5,6 +5,7 @@
  */
 package com.mvdit.framework.dao;
 
+import com.mvdit.framework.core.MvditApp;
 import com.mvdit.framework.core.MvditRuntimeException;
 import com.mvdit.framework.core.MvditUtils;
 import com.mvdit.framework.data.GenericFilter;
@@ -191,7 +192,7 @@ public abstract class GenericDAOJPAImpl<T, K> implements IGenericDAO<T, K> {
                 //em.close();
             }
         } catch (Exception ex) {
-
+            throw new MvditRuntimeException(ex);
         }
     }
 
@@ -204,9 +205,11 @@ public abstract class GenericDAOJPAImpl<T, K> implements IGenericDAO<T, K> {
             tx.begin();
             em.persist(entity);
             tx.commit();
+            MvditApp.getInstance().getLogger().info("Se ha creado correctamente el elemento " + entity);
             return entity;
         } catch (Exception ex) {
             rollbackTransactionAndCloseEntityManager(tx, em);
+            MvditApp.getInstance().getLogger().error("Error al crear el elemento " + entity + ": " + ex);
             throw new MvditRuntimeException(ex);
         } finally {
             em.close();
@@ -222,9 +225,11 @@ public abstract class GenericDAOJPAImpl<T, K> implements IGenericDAO<T, K> {
             tx.begin();
             em.merge(entity);
             tx.commit();
+            MvditApp.getInstance().getLogger().info("Se ha actualizado correctamente el elemento " + entity);
             return entity;
         } catch (Exception ex) {
             rollbackTransactionAndCloseEntityManager(tx, em);
+            MvditApp.getInstance().getLogger().error("Error al actualizar el elemento " + entity + ": " + ex);
             throw new MvditRuntimeException(ex);
         } finally {
             em.close();
@@ -240,9 +245,11 @@ public abstract class GenericDAOJPAImpl<T, K> implements IGenericDAO<T, K> {
             tx.begin();
             em.remove(em.merge(entity));
             tx.commit();
+            MvditApp.getInstance().getLogger().info("Se ha elimiinado correctamente el elemento " + entity);
             return 1;
         } catch (Exception ex) {
             rollbackTransactionAndCloseEntityManager(tx, em);
+            MvditApp.getInstance().getLogger().error("Error al eliminar el elemento " + entity + ": " + ex);
             throw new MvditRuntimeException(ex);
         } finally {
             em.close();

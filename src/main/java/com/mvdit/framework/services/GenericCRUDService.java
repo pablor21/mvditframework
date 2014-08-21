@@ -5,10 +5,16 @@
  */
 package com.mvdit.framework.services;
 
+import com.mvdit.framework.core.MvditApp;
 import com.mvdit.framework.core.MvditRuntimeException;
+import com.mvdit.framework.core.MvditUtils;
+import com.mvdit.framework.core.MvditValidatorException;
 import com.mvdit.framework.dao.IGenericDAO;
 import com.mvdit.framework.data.IFilter;
 import com.mvdit.framework.data.IPageResult;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Path;
 
 /**
  *
@@ -25,9 +31,17 @@ public abstract class GenericCRUDService<T, K> implements IGenericCRUDService<T,
             throw new MvditRuntimeException("The element cannot be null");
         }
 
-        /*if (MvditUtils.stringEmpty(entity.getPrimaryKeyName()) || MvditUtils.stringEmpty(entity.getTableName())) {
-            throw new MvditRuntimeException("The element " + entity.getClass().getSimpleName() + " not is a valid MvditEntity");
-        }*/
+        Set<ConstraintViolation<T>> violations = MvditUtils.getValidator().validate(entity);
+
+        if (violations.size() > 0) {
+            MvditApp.getInstance().getLogger().error(entity.getClass().getSimpleName() + entity + " [CREATE] tiene error de datos " +  violations);
+            MvditValidatorException mvditValidatorException = new MvditValidatorException();
+            for (ConstraintViolation<T> constraint : violations) {
+               
+                mvditValidatorException.addViolation(constraint);
+            }
+            throw mvditValidatorException;
+        }
 
         return true;
     }
@@ -37,15 +51,16 @@ public abstract class GenericCRUDService<T, K> implements IGenericCRUDService<T,
             throw new MvditRuntimeException("The element cannot be null");
         }
 
-        /*if (MvditUtils.stringEmpty(entity.getPrimaryKeyName()) || MvditUtils.stringEmpty(entity.getTableName())) {
-            throw new MvditRuntimeException("The element " + entity.getClass().getSimpleName() + " not is a valid MvditEntity");
+        Set<ConstraintViolation<T>> violations = MvditUtils.getValidator().validate(entity);
+
+        if (violations.size() > 0) {
+            MvditApp.getInstance().getLogger().error(entity.getClass().getSimpleName() + entity + " [UPDATE] tiene error de datos " +  violations);
+            MvditValidatorException mvditValidatorException = new MvditValidatorException();
+            for (ConstraintViolation<T> constraint : violations) {
+                mvditValidatorException.addViolation(constraint);
+            }
+            throw mvditValidatorException;
         }
-
-        if (entity.getId() == null || (MvditUtils.isNumeric(entity.getId().toString()) && (BigInteger.valueOf(Long.valueOf(entity.getId().toString())).compareTo(BigInteger.ZERO) <= 0))
-                || (entity.getId() instanceof String && MvditUtils.stringEmpty(entity.getId().toString()))) {
-            throw new MvditRuntimeException("The element " + entity.getClass().getSimpleName() + " has not a valid id");
-        }*/
-
         return true;
     }
 
@@ -55,15 +70,13 @@ public abstract class GenericCRUDService<T, K> implements IGenericCRUDService<T,
         }
 
         /*if (MvditUtils.stringEmpty(entity.getPrimaryKeyName()) || MvditUtils.stringEmpty(entity.getTableName())) {
-            throw new MvditRuntimeException("The element " + entity.getClass().getSimpleName() + " not is a valid MvditEntity");
-        }
+         throw new MvditRuntimeException("The element " + entity.getClass().getSimpleName() + " not is a valid MvditEntity");
+         }
 
          if (entity.getId() == null || (MvditUtils.isNumeric(entity.getId().toString()) && (BigInteger.valueOf(Long.valueOf(entity.getId().toString())).compareTo(BigInteger.ZERO) <= 0))
-                || (entity.getId() instanceof String && MvditUtils.stringEmpty(entity.getId().toString()))) {
-            throw new MvditRuntimeException("The element " + entity.getClass().getSimpleName() + " has not a valid id");
-        }*/
-
-
+         || (entity.getId() instanceof String && MvditUtils.stringEmpty(entity.getId().toString()))) {
+         throw new MvditRuntimeException("The element " + entity.getClass().getSimpleName() + " has not a valid id");
+         }*/
         return true;
     }
 
@@ -107,9 +120,9 @@ public abstract class GenericCRUDService<T, K> implements IGenericCRUDService<T,
     public T getById(K id) {
         return this.getDAOInstance().getById(id);
     }
-    
+
     @Override
-    public int count(IFilter filter){
+    public int count(IFilter filter) {
         return this.getDAOInstance().count(filter);
     }
 
