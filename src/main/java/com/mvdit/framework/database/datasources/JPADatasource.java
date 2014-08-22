@@ -95,4 +95,20 @@ public class JPADatasource {
     public synchronized EntityManager getEntityManager() {
         return this.getEntityManager(JPADatasource.DEFAULT_DB_ID);
     }
+    
+    public synchronized void clearCache(){
+        this.clearCache(JPADatasource.DEFAULT_DB_ID);
+    }
+    
+    public synchronized void clearCache(String dbId){
+        this.dataSources.get(dbId).getCache().evictAll();
+    }
+    
+    public synchronized void clearCache(Class<?> clasz){
+        this.clearCache(JPADatasource.DEFAULT_DB_ID, clasz);
+    }
+    
+    public synchronized void clearCache(String dbId, Class<?> clasz){
+        this.dataSources.get(dbId).getCache().evict(clasz);
+    }
 }

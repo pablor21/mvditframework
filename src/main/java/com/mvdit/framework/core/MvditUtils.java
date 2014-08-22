@@ -12,8 +12,6 @@ import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
-import java.util.Set;
-import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -81,7 +79,7 @@ public class MvditUtils {
         BigInteger bi = new BigInteger(strVal);
         return bi;
     }
-    
+
     /**
      * Validador de las entidades
      *
@@ -93,6 +91,23 @@ public class MvditUtils {
 
         return validator;
     }
+
+    public static String getOS(){
+        String OS = System.getProperty("os.name").toLowerCase();
+        return OS;
+    }
     
-    
+    public static boolean isWindows() {
+        return (MvditUtils.getOS().indexOf("win") >= 0);
+    }
+    public static boolean isMac() {
+        return (MvditUtils.getOS().indexOf("mac") >= 0);
+    }
+    public static boolean isUnix() {
+        return (MvditUtils.getOS().indexOf("nix") >= 0 || MvditUtils.getOS().indexOf("nux") >= 0 || MvditUtils.getOS().indexOf("aix") > 0);
+    }
+    public static boolean isSolaris() {
+        return (MvditUtils.getOS().indexOf("sunos") >= 0);
+    }
+
 }

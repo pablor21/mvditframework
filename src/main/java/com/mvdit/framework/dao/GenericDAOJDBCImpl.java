@@ -11,7 +11,6 @@ import com.mvdit.framework.data.GenericPageResult;
 import com.mvdit.framework.data.IFilter;
 import com.mvdit.framework.data.IPageResult;
 import com.mvdit.framework.data.OrderParam;
-import com.mvdit.framework.data.QueryCondition;
 import com.mvdit.framework.database.DBInsertResponse;
 import com.mvdit.framework.database.DBSelectResponse;
 import com.mvdit.framework.database.DBUpdateResponse;
@@ -19,10 +18,10 @@ import com.mvdit.framework.database.IDBManager;
 import com.mvdit.framework.database.IDBEntity;
 import com.mvdit.framework.database.TransactionException;
 import com.mvdit.framework.database.datasources.JDBCDatasource;
+import com.mvdit.framework.database.datasources.JPADatasource;
 import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -317,5 +316,14 @@ public abstract class GenericDAOJDBCImpl<T extends IDBEntity, K> implements IGen
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
+    public void clearAllCache(){
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void clearCacheOfEntity(){
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
 }

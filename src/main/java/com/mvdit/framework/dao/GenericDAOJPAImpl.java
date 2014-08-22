@@ -13,8 +13,6 @@ import com.mvdit.framework.data.GenericPageResult;
 import com.mvdit.framework.data.IFilter;
 import com.mvdit.framework.data.IPageResult;
 import com.mvdit.framework.data.OrderParam;
-import com.mvdit.framework.data.QueryCondition;
-import com.mvdit.framework.data.QueryConditionGroup;
 import com.mvdit.framework.database.TransactionException;
 import com.mvdit.framework.database.datasources.JPADatasource;
 import java.lang.reflect.ParameterizedType;
@@ -81,60 +79,60 @@ public abstract class GenericDAOJPAImpl<T, K> implements IGenericDAO<T, K> {
     public String getConditionsStr(IFilter filter) {
         StringBuilder sb = new StringBuilder();
         if (filter != null) {
-            String str= filter.getWhereSentence(getDefaultQueryObjectName());
-            if(!MvditUtils.stringEmpty(str)){
+            String str = filter.getWhereSentence(getDefaultQueryObjectName());
+            if (!MvditUtils.stringEmpty(str)) {
                 sb.append(" WHERE ");
             }
             sb.append(str);
             /*List<QueryCondition> conditions = filter.getConditions();
-            boolean incOp=false;
-            for(QueryCondition cond:conditions){
-                if (sb.toString().equalsIgnoreCase("")) {
-                    sb.append(" WHERE ");
-                }
-                sb.append(cond.getSentenceStr(getDefaultQueryObjectName(), incOp));
-                sb.append(" ");
-                incOp= true;
-            }*/
+             boolean incOp=false;
+             for(QueryCondition cond:conditions){
+             if (sb.toString().equalsIgnoreCase("")) {
+             sb.append(" WHERE ");
+             }
+             sb.append(cond.getSentenceStr(getDefaultQueryObjectName(), incOp));
+             sb.append(" ");
+             incOp= true;
+             }*/
             /*Map<String, QueryConditionGroup> groups = filter.getConditions();
-            Iterator<String> groupIterator = groups.keySet().iterator();
-            boolean isFirstGroup = true;
-            int index = 1;
-            while (groupIterator.hasNext()) {
-                String key = groupIterator.next();
-                QueryConditionGroup group = groups.get(key);
-                Iterator<String> condIterator = group.getConditions().keySet().iterator();
+             Iterator<String> groupIterator = groups.keySet().iterator();
+             boolean isFirstGroup = true;
+             int index = 1;
+             while (groupIterator.hasNext()) {
+             String key = groupIterator.next();
+             QueryConditionGroup group = groups.get(key);
+             Iterator<String> condIterator = group.getConditions().keySet().iterator();
 
-                if (sb.toString().equalsIgnoreCase("")) {
-                    sb.append(" WHERE ");
-                }
+             if (sb.toString().equalsIgnoreCase("")) {
+             sb.append(" WHERE ");
+             }
 
-                if (!isFirstGroup) {
-                    sb.append(group.getOperator()).append(" ");
-                }
-                sb.append("(");
-                boolean isFirstCond = true;
-                while (condIterator.hasNext()) {
-                    String condKey = condIterator.next();
-                    QueryCondition condition = group.getCondition(condKey);
-                    if (condition.isValid()) {
-                        if (!isFirstCond) {
-                            sb.append(condition.getOperator()).append(" ");
-                        }
-                        sb.append(getDefaultQueryObjectName());//nombre del obj
-                        sb.append(".");//separador de field
-                        sb.append(condition.getField());//nombre del campo
-                        sb.append(" ");//espacio para separar la definicion
-                        sb.append(condition.getComparator());//operador de comparacion
-                        sb.append(" :").append(key).append("_").append(condKey);//nombre del parámetro
-                        sb.append(" ");//espacio para separar
-                        isFirstCond = false;
-                        index++;
-                    }
-                }
-                sb.append(")");
-                isFirstGroup = false;
-            }*/
+             if (!isFirstGroup) {
+             sb.append(group.getOperator()).append(" ");
+             }
+             sb.append("(");
+             boolean isFirstCond = true;
+             while (condIterator.hasNext()) {
+             String condKey = condIterator.next();
+             QueryCondition condition = group.getCondition(condKey);
+             if (condition.isValid()) {
+             if (!isFirstCond) {
+             sb.append(condition.getOperator()).append(" ");
+             }
+             sb.append(getDefaultQueryObjectName());//nombre del obj
+             sb.append(".");//separador de field
+             sb.append(condition.getField());//nombre del campo
+             sb.append(" ");//espacio para separar la definicion
+             sb.append(condition.getComparator());//operador de comparacion
+             sb.append(" :").append(key).append("_").append(condKey);//nombre del parámetro
+             sb.append(" ");//espacio para separar
+             isFirstCond = false;
+             index++;
+             }
+             }
+             sb.append(")");
+             isFirstGroup = false;
+             }*/
         }
         return sb.toString();
     }
@@ -179,7 +177,7 @@ public abstract class GenericDAOJPAImpl<T, K> implements IGenericDAO<T, K> {
         while (iterator.hasNext()) {
             String key = iterator.next();
             Object value = parametersValues.get(key);
-            query.setParameter(key, value);            
+            query.setParameter(key, value);
         }
     }
 
@@ -372,4 +370,15 @@ public abstract class GenericDAOJPAImpl<T, K> implements IGenericDAO<T, K> {
         return em.getTransaction().isActive();
     }
 
+    @Override
+    public void clearAllCache() {
+        JPADatasource.getInstance().clearCache();
+        MvditApp.getInstance().getLogger().warn("Se han eliminado todos los objetos de la caché.");
+    }
+
+    @Override
+    public void clearCacheOfEntity() {
+        JPADatasource.getInstance().clearCache(entityClass);
+        MvditApp.getInstance().getLogger().warn("Se han eliminado todos los objetos de tipo [" + entityClass + "] de la caché.");
+    }
 }

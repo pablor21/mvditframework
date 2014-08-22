@@ -66,4 +66,8 @@ public interface IGenericDAO<T, K> extends ITransaction{
      * @return 
      */
     int count(IFilter filter);
+    
+    void clearAllCache();
+    
+    void clearCacheOfEntity();
 }
