@@ -9,10 +9,12 @@ import com.mvdit.framework.core.MvditApp;
 import com.mvdit.framework.core.MvditRuntimeException;
 import com.mvdit.framework.core.MvditUtils;
 import com.mvdit.framework.core.PropertiesRepository;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,7 +33,7 @@ public class DbBackup {
     public static final String PROPS_FILE = "mvdit_db_backup";
 
     public static String backupDatabase(String dbId) {
-        dbId=(!MvditUtils.stringEmpty(dbId))?dbId:"default";
+        dbId = (!MvditUtils.stringEmpty(dbId)) ? dbId : "default";
         PropertiesRepository props = PropertiesRepository.getInstance();
         String execPath = props.getProperty("execPath", PROPS_FILE);
         String outputPath = props.getProperty("outputPath", PROPS_FILE);
@@ -52,22 +54,27 @@ public class DbBackup {
         opts.put("database", database);
         opts.put("host", host);
         opts.put("filename", filename);
+        
+        File f= new File(outputPath);
+        if(!f.exists()){
+            f.mkdirs();
+        }
 
         return doBackup(outputPath, execPath, opts).replace(outputPath, "");
     }
-    
-    public static File getBackup(String fileName){
+
+    public static File getBackup(String fileName) {
         PropertiesRepository props = PropertiesRepository.getInstance();
         String basePath = props.getProperty("outputPath", PROPS_FILE);
-        File f=new File(basePath +"/" + fileName);
-        if(f.exists()){
+        File f = new File(basePath + "/" + fileName);
+        if (f.exists()) {
             return f;
-        }else{
+        } else {
             throw new MvditRuntimeException("El archivo " + fileName + " no existe, es posible que se haya eliminado.");
         }
     }
 
-    private static String doBackup(String outputPath, String execPath, Map<String, String> opts){
+    private static String doBackup(String outputPath, String execPath, Map<String, String> opts) {
 
         String filename = outputPath + "/" + opts.get("filename");
         List<String> args = new ArrayList<>();
@@ -93,28 +100,33 @@ public class DbBackup {
         for (String str : args) {
             execStr += str;
         }
-        
-        
 
         try {
-            ProcessBuilder pb =null;
+            ProcessBuilder pb = null;
+            Process p = null;
             if (MvditUtils.isWindows()) {
                 pb = new ProcessBuilder(new String[]{"cmd.exe", "/c", execStr});
+                p = pb.start();
             } else {
-                pb = new ProcessBuilder(new String[]{"cmd.exe", "/c", execStr});
+                pb = new ProcessBuilder(new String[]{"/bin/sh", "-c", execStr});
+                p = pb.start();
             }
             MvditApp.getInstance().getLogger().info("Ejecutando backup: " + execStr);
             //pb.redirectError();
-            Process p = pb.start();
-
-            InputStream is = p.getInputStream();
-
-            int in = -1;
-            String out="";
-            while ((in = is.read()) != -1) {
-                out+=((char) in);
+            BufferedReader stdInput = new BufferedReader(new
+                 InputStreamReader(p.getInputStream()));
+ 
+            BufferedReader stdError = new BufferedReader(new
+                 InputStreamReader(p.getErrorStream()));
+            String in, out="";
+            while ((in = stdInput.readLine()) != null) {
+                out+=in;
             }
-            if(!MvditUtils.stringEmpty(out)){
+             
+            while ((in = stdError.readLine()) != null) {
+                out+=in;
+            }
+            if (!MvditUtils.stringEmpty(out)) {
                 MvditApp.getInstance().getLogger().error("Salida de mysqldump: " + out);
             }
             int proccessCompleted = p.waitFor();

@@ -46,6 +46,12 @@ public class QueryCondition {
         this.dataType = QueryConditionDataTypes.OBJECT;
         this.ignoreOnPlain = false;
     }
+    
+    public QueryCondition(String id, String field, Object singleValue, QueryConditionDataTypes dataType,QueryConditionComparators comparator, QueryConditionOperators operator) {
+       this(id, field, comparator, operator);
+       this.singleValue=singleValue;
+       this.dataType=dataType;
+    }
 
     public QueryCondition() {
         this("", "", QueryConditionComparators.NONE, QueryConditionOperators.NONE);
